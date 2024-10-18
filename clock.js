@@ -1,5 +1,6 @@
 const Clock = class {
   #tid = null;
+  #insertTitle = false;
   constructor() {
 	this.element = document.getElementById('clock')
 	this.splitDate = '-';
@@ -19,6 +20,27 @@ const Clock = class {
 	this.intervalSec = (intervalSec >= 1000) ? intervalSec : 10000;
 	return;
   }
+  enableTitle(param) {
+	this.#insertTitle = param ? true : false;
+	return this.#insertTitle;
+  }
+  addToTitle() {
+	let value;
+	const title = document.querySelector('title');
+	block:{
+	  if (this.#insertTitle && title) {
+		value = ' ['+ this.getTime() + ']'
+		let prevalue = title.innerText.match(/ \[\d+:\d+\]/);
+		if (prevalue && prevalue.length) {
+		  prevalue = prevalue[0];
+		  if (value == prevalue) break block;
+		  title.innerText = title.innerText.replace(prevalue,'');
+		}
+		title.innerText += value;
+	  }
+	}
+	return value;
+  }
   refresh() {
 	this.date = new Date();
 	this.element.innerText = '';
@@ -28,6 +50,7 @@ const Clock = class {
 	  this.stop();
 	  this.start();
 	}
+	if (this.#insertTitle) this.addToTitle();
 	return;
   }
   start() {
@@ -48,6 +71,7 @@ const Clock = class {
   toggleRefresh() {
 	switch (this.#tid) {
 	case null:
+	  this.refresh();
 	  this.start();
 	  break;
 	default:

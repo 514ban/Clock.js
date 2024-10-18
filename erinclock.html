@@ -37,10 +37,7 @@
 	 return new Intl.DateTimeFormat([],{ hour:'2-digit', minute:'2-digit', timeZone:'UTC'}).format(erinTime);
    }
    refresh() {
-	this.date = new Date();
-	this.element.innerText = '';
-	this.element.insertAdjacentElement('afterbegin', this.makeElement('div','tm',this.getTime()));
-	this.element.insertAdjacentElement('afterbegin', this.makeElement('div','dt',this.getDate()));
+	super.refresh();
 	this.element.querySelector('div.tm').insertAdjacentElement('beforeend', this.makeElement('span','etm','[ET]'+this.erinTime()));
 	return;
    }
@@ -49,6 +46,7 @@
    const clk = new erinClock();
    clk.setLocales('ja-JP');
    clk.setNoSeconds(1000);
+   clk.enableTitle(true);
    clk.refresh();
    clk.start();
  });
