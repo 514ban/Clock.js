@@ -1,0 +1,29 @@
+ #clock {
+   display:inline-block;
+   width:192px;
+   margin:0.5em 1em;
+   border:4px solid; border-radius:8px;
+   padding:0.5em 0.75em;
+   cursor:pointer;
+   text-align:left;
+
+   color:#333; background:#fff;
+   &.stop {
+	 color:#33333380;
+   }
+   .dt { color:#336; }
+   @media (prefers-color-scheme: dark) {
+	 color:#fff; background:#333;
+	 &.stop {
+	   color:#ffffff80;
+	 }
+	 border-color:#ccc;
+	 .dt { color:#ccf; }
+   }
+
+   font-family:arial; 
+   .dt { font-size:20pt; }
+   .tm {
+	 font-size:40pt; font-weight:bold;
+   }
+ }

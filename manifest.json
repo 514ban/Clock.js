@@ -1,0 +1,15 @@
+{
+    "name": "Clock",
+    "short_name": "WebApp_Clock",
+    "start_url": "./index.html",
+    "display": "standalone",
+    "background_color": "#000000",
+    "theme_color": "#ffffff",
+    "icons": [
+        {
+            "src": "./icon.svg",
+            "sizes": "192x192",
+            "type": "image/svg+xml"
+        }
+    ]
+}

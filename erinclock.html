@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html>
+<html>
+<head>
+<link rel="manifest" href="./manifest.json"/>
+<link rel="icon" href="icon.svg" type="image/svg+xml"/>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="initial-scale=1.0"/>
+<title>local clock</title>
+<script type="text/javascript">
+ window.addEventListener('load',()=>{
+   const regbtn = document.querySelector('#register');
+   if (regbtn) {
+	 regbtn.addEventListener('click',() => {
+	   if ('serviceWorker' in navigator) {
+		 navigator.serviceWorker.register('./service-worker.js')
+				  .then((registration) => {
+					console.log('Service Worker registered with scope:', registration.scope);
+				  })
+				  .catch((error) => {
+					console.log('Service Worker registration failed:', error);
+				  });
+	   }
+	 });
+   }
+ });
+</script>
+<script type="text/javascript" src="./clock.js"></script>
+<script type="text/javascript">
+ class erinClock extends Clock {
+   erinTime() {
+	 const factor = 40;
+	 const realTime = this.date.getTime();
+	 const erinMilliseconds = ((realTime) * factor) % (24 * 60 * 60 * 1000);
+	 const erinTime = new Date();
+	 erinTime.setUTCHours(0, 0, 0, erinMilliseconds ); 
+	 return new Intl.DateTimeFormat([],{ hour:'2-digit', minute:'2-digit', timeZone:'UTC'}).format(erinTime);
+   }
+   refresh() {
+	this.date = new Date();
+	this.element.innerText = '';
+	this.element.insertAdjacentElement('afterbegin', this.makeElement('div','tm',this.getTime()));
+	this.element.insertAdjacentElement('afterbegin', this.makeElement('div','dt',this.getDate()));
+	this.element.querySelector('div.tm').insertAdjacentElement('beforeend', this.makeElement('span','etm','[ET]'+this.erinTime()));
+	return;
+   }
+ }
+ window.addEventListener('load',(e)=>{
+   const clk = new erinClock();
+   clk.setLocales('ja-JP');
+   clk.setNoSeconds(1000);
+   clk.refresh();
+   clk.start();
+ });
+</script>
+<link rel="stylesheet" type="text/css" href="./clock.css"/>
+<style type="text/css">
+ body {
+   width:100vw; height:100vh;
+   margin:0; padding:0;
+   color:#000; background:#fff;
+   @media (prefers-color-scheme: dark) {
+	 color:#fff; background:#000;
+   }
+ }
+ 
+ #clock {
+   width:256px;
+   .tm {
+	 .etm {
+	   display:inline-block;
+	   font-size:40%; padding-left:0.5em;
+	   color:rgba(255,128,80,0.5);
+	   @media (prefers-color-scheme: dark) {
+		 color:rgba(255,172,80,1);
+	   }
+	 }
+   }
+ }
+</style>
+</head>
+<body>
+<main>
+<section>
+<article>
+<div id="clock"></div>
+</article>
+</section>
+</main>
+</body>
+</html>
