@@ -3,19 +3,12 @@
 <html>
 <head>
 <link rel="manifest" href="./manifest.json"/>
-<link rel="icon" href="icon.svg" type="image/svg+xml"/>
+<link rel="icon" href="./icon.svg" type="image/svg+xml"/>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="initial-scale=1.0"/>
-<title>local clock</title>
-<script type="text/javascript">
- window.addEventListener('load',()=>{
-   if (window.matchMedia('(display-mode: standalone)').matches) {
-     window.resizeTo(500, 200);
-   }
- });
-</script>
-<script type="text/javascript" src="./clock.js"></script>
-<script type="text/javascript">
+<title>local clock with ET</title>
+<script type="module">
+ import { Clock } from "../clock.js";
  class erinClock extends Clock {
    erinTime() {
 	 const factor = 40;
@@ -32,6 +25,10 @@
    }
  }
  window.addEventListener('load',(e)=>{
+   if (window.matchMedia('(display-mode: standalone)').matches) {
+     window.resizeTo(500, 240);
+	 document.body.classList.add('pwa');
+   }
    const clk = new erinClock();
    clk.setLocales('ja-JP');
    clk.setNoSeconds(1000);

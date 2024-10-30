@@ -7,16 +7,13 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="initial-scale=1.0"/>
 <title>local clock</title>
-<script type="text/javascript">
- window.addEventListener('load',()=>{
-   if (window.matchMedia('(display-mode: standalone)').matches) {
-     window.resizeTo(500, 200);
-   }
- });
-</script>
-<script type="text/javascript" src="./clock.js"></script>
-<script type="text/javascript">
+<script type="module">
+ import { Clock } from './clock.js';
  window.addEventListener('load',(e)=>{
+   if (window.matchMedia('(display-mode: standalone)').matches) {
+     window.resizeTo(500, 240);
+	 document.body.classList.add('pwa');
+   }
    const clk = new Clock();
    clk.setLocales('ja-JP');
    clk.setNoSeconds(10000);

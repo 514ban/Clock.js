@@ -1,4 +1,4 @@
-const Clock = class {
+export class Clock {
   #tid = null;
   #insertTitle = false;
   constructor() {

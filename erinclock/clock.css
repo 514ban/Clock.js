@@ -1,7 +1,6 @@
 #clock {
-  box-sizing:border-box;
   display:inline-block;
-  width:220px;
+  width:192px;
   margin:0.5em 1em;
   border:4px solid; border-radius:8px;
   padding:0.5em 0.75em;
