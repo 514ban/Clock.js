@@ -8,11 +8,24 @@
 <meta name="viewport" content="initial-scale=1.0"/>
 <title>local clock with ET</title>
 <script type="module">
+ document.resetBodyHeight = function() {
+   if (window.innerHeight != document.body.getBoundingClientRect().height) {
+	 document.body.style.height = String(window.innerHeight) + 'px';
+   }
+ }
+ window.addEventListener('load',document.resetBodyHeight);
+ window.addEventListener('resize',document.resetBodyHeight);
+ 
  import { Clock } from "../clock.js";
  class erinClock extends Clock {
+   constructor() {
+	 super();
+	 this.diffsec = 0;
+	 this.menuBtn = false;
+   }
    erinTime() {
 	 const factor = 40;
-	 const realTime = this.date.getTime();
+	 const realTime = this.date.getTime() + this.diffsec;
 	 const erinMilliseconds = ((realTime) * factor) % (24 * 60 * 60 * 1000);
 	 const erinTime = new Date();
 	 erinTime.setUTCHours(0, 0, 0, erinMilliseconds ); 
@@ -20,8 +33,54 @@
    }
    refresh() {
 	super.refresh();
-	this.element.querySelector('div.tm').insertAdjacentElement('beforeend', this.makeElement('span','etm','[ET]'+this.erinTime()));
+	this.element.querySelector('div.tm').insertAdjacentElement('beforeend', this.makeElement('div','etm','[ET]'+this.erinTime()));
 	return;
+   }
+   setDiffSec(sec) {
+	 this.diffsec = sec;
+	 return this.diffsec;
+   }
+   addPopupMenu(elem) {
+	 if (!elem) return;
+	 const menu = document.querySelector('dialog#popupmenu');
+	 if (!menu) return;
+
+	 if (this.menuBtn) {
+	   this.menuBtn.removeEventListener('click',this.popupMenu);
+	   menu.removeEventListener('close',this.execPopupMenu);
+	   this.menuBtn = false;
+	 }
+
+	 this.menuBtn = elem;
+	 if (this.menuBtn) {
+	   this.popupMenu = this.popupMenu.bind(this);
+	   this.menuBtn.addEventListener('click',this.popupMenu);
+	   this.execPopupMenu = this.execPopupMenu.bind(this);
+	   menu.addEventListener('close',this.execPopupMenu);
+	 }
+
+	 return this.menuBtn;
+   }
+   execPopupMenu(e) {
+	 const formdata = new FormData(e.target.querySelector('form'));
+	 this.setDiffSec(parseInt(formdata.get('diffsec')));
+	 this.enableTitle(formdata.get('insertTitle') == 'on' ? true : false);
+	 if (!formdata.get('insertTitle')) this.addToTitle();
+	 this.setBottomDate(formdata.get('bottomDate') == 'on' ? true : false);
+	 return;
+   }
+   popupMenu() {
+	 const menu = document.querySelector('dialog#popupmenu');
+	 if (menu) {
+	   const form = menu.querySelector('form');
+	   if (form) {
+		 form.querySelector('[name=diffsec]').value = this.diffsec;
+		 form.querySelector('[name=insertTitle]').checked = this.getEnableTitle() ? true : false;
+		 form.querySelector('[name=bottomDate]').checked = this.getBottomDate() ? true : false;
+		 menu.showModal();
+	   }
+	 }
+	 return;
    }
  }
  window.addEventListener('load',(e)=>{
@@ -29,15 +88,20 @@
      window.resizeTo(500, 168);
 	 document.body.classList.add('pwa');
    }
+
    const clk = new erinClock();
+   document.clk = clk;
    clk.setLocales('ja-JP');
    clk.setNoSeconds(1000);
    clk.enableTitle(true);
+   clk.setBottomDate(true);
+   clk.setDiffSec(0);
+   clk.addPopupMenu(document.querySelector('.hmenu'));
    clk.refresh();
    clk.start();
  });
 </script>
-<link rel="stylesheet" type="text/css" href="./clock.css"/>
+<link rel="stylesheet" type="text/css" href="../clock.css"/>
 <style type="text/css">
  body {
    width:100vw; height:100vh;
@@ -46,17 +110,87 @@
    @media (prefers-color-scheme: dark) {
 	 color:#fff; background:#000;
    }
+   overflow:hidden;
+   main,section,article {
+	 width:100%; height:100%;
+   }
  }
  
- #clock {
-   width:256px;
-   .tm {
-	 .etm {
-	   display:inline-block;
-	   font-size:40%; padding-left:0.5em;
-	   color:rgba(255,128,80,0.5);
-	   @media (prefers-color-scheme: dark) {
-		 color:rgba(255,172,80,1);
+ @container clockParts (width > 240px) and (height > 6em) {
+   #clock_parts {
+	 #clock {
+	   .dt {
+		 padding-left:40px;
+		 &.bottom {
+		   padding-left:unset;
+		 }
+	   }
+	   .tm {
+		 display:grid;
+		 grid-template-columns:auto;
+		 grid-template-rows:auto 0.75em;
+		 @media (orientation:landscape) {
+		   grid-template-columns:auto auto;
+		   grid-template-rows:100%;
+		 }
+		 justify-content:center;
+		 align-items:center;
+
+		 .etm {
+		   display:inline-block; 
+		   font-size:0.5em;
+		   justify-self:flex-end;
+		   @media (orientation:landscape) {
+			 font-size:6cqw;
+			 align-self:flex-end;
+			 padding-left:0.5em;
+		   }
+
+		   color:rgba(255,128,80,0.5);
+		   @media (prefers-color-scheme: dark) {
+			 color:rgba(255,172,80,1);
+		   }
+		 }
+	   }
+	 }
+
+	 .hmenu {
+	   display: block;
+	   cursor: pointer;
+	   position:absolute;
+	   left:16px; top:12px;
+	   z-index:9999;
+
+	   > span {
+		 display: block;
+		 width: 20px;
+		 height: 2px;
+		 margin: 4px 0;
+		 background-color: #333;
+		 @media (prefers-color-scheme: dark) {
+		   background-color: #ccc;
+		 }
+	   }
+	 }
+
+	 dialog {
+	   max-width:80vw;
+	   max-height:80vh;
+	   color:#000; background:#ccc;
+	   font-size:10pt;
+	   dl {
+		 margin:0;
+		 line-height:1.5em;
+		 dt,dd {
+		   margin:0;
+		 }
+		 dd {
+		   margin-left:1em;
+		 }
+	   }
+	   label + input {
+		 display:inline-block;
+		 margin-left:0.5em;
 	   }
 	 }
    }
@@ -65,11 +199,24 @@
 </head>
 <body>
 <main>
-<section>
-<article>
-<div id="clock"></div>
+<section id="clock_parts">
+<div class="hmenu">
+<span></span><span></span><span></span>
+</div>
+<article id="clock">
 </article>
 </section>
+<dialog id="popupmenu"><form method="dialog">
+<dl>
+<dt>＜設定＞</dt>
+<dt><label>insertTitle</label><input type="checkbox" name="insertTitle"/> Yes</dt>
+<dt><label>bottom-date</label><input type="checkbox" name="bottomDate"/> Yes</dt>
+<dt><label>diffsec:</label><input type="number" name="diffsec" value="0"/>ミリ秒</dt>
+<dd>現在時刻を指定ミリ秒ずらす。</dd>
+<dt>（ミリ秒は秒の1000倍。60秒＝60000ミリ秒）</dt>
+</dl>
+<button>ok</button>
+</form></dialog>
 </main>
 </body>
 </html>

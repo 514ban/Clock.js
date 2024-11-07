@@ -1,6 +1,8 @@
 export class Clock {
   #tid = null;
   #insertTitle = false;
+  #dateBottom = false;
+  #noSecond = false;
   constructor() {
 	this.element = document.getElementById('clock')
 	this.splitDate = '-';
@@ -9,34 +11,51 @@ export class Clock {
 	this.intervalSec = 1000;
 	this.setLocales();
 	this.date = null;
-	this.element.addEventListener('click',()=>{ this.toggleRefresh(); });
+	this.toggleRefresh = this.toggleRefresh.bind(this);
+	this.element.addEventListener('click',this.toggleRefresh);
   }
   setLocales(locales) {
 	this.locales = locales ? locales : [];
 	return;
   }
   setNoSeconds(intervalSec) {
-	this.timeinits = { hour: '2-digit', minute: '2-digit' };
-	this.intervalSec = (intervalSec >= 1000) ? intervalSec : 10000;
-	return;
+	this.#noSecond = intervalSec ? true : false;
+	if (this.#noSecond) {
+	  this.timeinits = { hour: '2-digit', minute: '2-digit' };
+	  this.intervalSec = (intervalSec >= 1000) ? intervalSec : 10000;
+	}
+	return this.#noSecond;
+  }
+  getNoSeconds() {
+	return this.#noSecond;
   }
   enableTitle(param) {
 	this.#insertTitle = param ? true : false;
 	return this.#insertTitle;
   }
+  getEnableTitle() {
+	return this.#insertTitle;
+  }
+  setBottomDate(param) {
+	this.#dateBottom = param ? true : false;
+	return this.#dateBottom;
+  }
+  getBottomDate() {
+	return this.#dateBottom;
+  }
   addToTitle() {
 	let value;
 	const title = document.querySelector('title');
 	block:{
-	  if (this.#insertTitle && title) {
-		value = ' ['+ this.getTime() + ']'
+	  if (title) {
+		value = ' ['+ this.getTime() + ']';
 		let prevalue = title.innerText.match(/ \[\d+:\d+\]/);
 		if (prevalue && prevalue.length) {
 		  prevalue = prevalue[0];
-		  if (value == prevalue) break block;
+		  if (this.#insertTitle && value == prevalue) break block;
 		  title.innerText = title.innerText.replace(prevalue,'');
 		}
-		title.innerText += value;
+		if (this.#insertTitle) { title.innerText += value; }
 	  }
 	}
 	return value;
@@ -46,6 +65,12 @@ export class Clock {
 	this.element.innerText = '';
 	this.element.insertAdjacentElement('afterbegin', this.makeElement('div','tm',this.getTime()));
 	this.element.insertAdjacentElement('afterbegin', this.makeElement('div','dt',this.getDate()));
+	if (this.#noSecond) {
+	  this.element.querySelector('div.tm').classList.add('nosec');
+	}
+	if (this.#dateBottom) {
+	  this.element.querySelector('div.dt').classList.add('bottom');
+	}
 	if (this.#tid && !(this.date.getMinutes() % 5)) {
 	  this.stop();
 	  this.start();

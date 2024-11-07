@@ -8,6 +8,14 @@
 <meta name="viewport" content="initial-scale=1.0"/>
 <title>local clock</title>
 <script type="module">
+ document.resetBodyHeight = function() {
+   if (window.innerHeight != document.body.getBoundingClientRect().height) {
+	 document.body.style.height = String(window.innerHeight) + 'px';
+   }
+ }
+ window.addEventListener('load',document.resetBodyHeight);
+ window.addEventListener('resize',document.resetBodyHeight);
+ 
  import { Clock } from './clock.js';
  window.addEventListener('load',(e)=>{
    if (window.matchMedia('(display-mode: standalone)').matches) {
@@ -17,18 +25,23 @@
    const clk = new Clock();
    clk.setLocales('ja-JP');
    clk.setNoSeconds(10000);
+   clk.setBottomDate(true);
    clk.refresh();
    clk.start();
  });
 </script>
 <link rel="stylesheet" type="text/css" href="./clock.css"/>
 <style type="text/css">
+ * { scrollbar-width:thin; box-sizing:border-box; }
  body {
    width:100vw; height:100vh;
-   margin:0; padding:0;
+   margin:0; padding:8px;
    color:#000; background:#fff;
    @media (prefers-color-scheme: dark) {
 	 color:#fff; background:#000;
+   }
+   main {
+	 width:100%; height:100%;
    }
  }
 </style>
@@ -36,9 +49,8 @@
 <body>
 <header></header>
 <main>
-<section>
-<article>
-<div id="clock"></div>
+<section id="clock_parts">
+<article id="clock">
 </article>
 </section>
 </main>
