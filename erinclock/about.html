@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="initial-scale=1.0"/>
+<title>about / Regist ServiceWorker.js</title>
+<script type="text/javascript">
+ window.addEventListener('load',()=>{
+   if ('serviceWorker' in navigator) {
+	 const regServ = function() {
+	   let result = '';
+	   let resmes = document.getElementById('result');
+	   navigator.serviceWorker.register('./service-worker.js')
+				.then(function(registration) {
+				  result = 'Service Workerを登録しました。';
+				  resmes.innerText = result;
+				})
+				.catch(function(error) {
+				  result = 'Service Workerを登録できませんでした。';
+				  resmes.innerText = result;
+				});
+	   return result;
+	 };
+	 const regbtn = document.createElement('button');
+	 regbtn.addEventListener('click',regServ);
+	 regbtn.innerText = '登録';
+	 document.body.querySelector('#reg').append(regbtn);
+   }
+ });
+
+ window.addEventListener('load',()=>{
+   if ('serviceWorker' in navigator) {
+	 const rmvServ = function() {
+	   let result = '';
+	   let resmes = document.getElementById('result');
+	   navigator.serviceWorker.getRegistrations().then(function(registrations) {
+		 if (registrations.length) {
+		   registrations.forEach(function(registration) {
+			 registration.unregister().then(function(success) {
+			   if (success) {
+				 result = 'Service Workerの登録削除しました。';
+				 resmes.innerText = result;
+			   } else {
+				 result = 'Service Workerの登録を削除できませんでした。';
+				 resmes.innerText = result;
+			   }
+			 });
+		   });
+		 } else {
+		   result = 'Service Workerの登録がありませんでした。';
+		   resmes.innerText = result;
+		 }
+	   });
+	   document.getElementById('result').innerText = result;
+	   return result;
+	 };
+	 const rmvbtn = document.createElement('button');
+	 rmvbtn.addEventListener('click',rmvServ);
+	 rmvbtn.innerText = '削除';
+	 document.body.querySelector('#rmv').append(rmvbtn);
+
+   }
+ });
+</script>
+<style type="text/css">
+ section {
+   > h1 { font-size:1em; }
+   article { margin:0.5em; }
+ }
+</style>
+</head>
+<body>
+<header>Clock with ErinClockについて</header>
+<nav></nav>
+<main>
+<section>
+<h1>About.</h1>
+<p>
+単純な時刻表示（エリン時間付）です。<br/>
+ブラウザ時刻ベースのため、エリン時間については、サーバ時刻とのズレが生じる場合があります。<br/>
+設定画面のdiffsec部分で現実時刻での差分ミリ秒（マイナス値も可）を入れ直すと調整可能です。<br/>
+（ミリ秒は秒数の1000倍です）
+</p>
+</section>
+<section>
+<h1>Clock用ServiceWorker.jsの登録・削除</h1>
+<p>
+SeriviceWorker.jsの自動登録をしていないので、アプリ化する場合は、下のボタンで手動登録してください。
+</p>
+</section>
+<section>
+<article id="reg"></article>
+</section>
+<section>
+<article id="rmv"></article>
+</section>
+<section>
+<article id="result"></article>
+</section>
+</main>
+<footer></footer>
+</body>
+</html>

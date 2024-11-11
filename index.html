@@ -24,10 +24,13 @@
    }
    const clk = new Clock();
    clk.setLocales('ja-JP');
-   clk.setNoSeconds(10000);
+   clk.setNoSeconds(30000);
+   /*clk.setWithUTC(true);*/
    clk.setBottomDate(true);
+   clk.addPopupMenu(document.querySelector('.hmenu'));
    clk.refresh();
    clk.start();
+   document.c = clk;
  });
 </script>
 <link rel="stylesheet" type="text/css" href="./clock.css"/>
@@ -50,9 +53,13 @@
 <header></header>
 <main>
 <section id="clock_parts">
+<div class="hmenu">
+<span></span><span></span><span></span>
+</div>
 <article id="clock">
 </article>
 </section>
+<dialog id="popupmenu"><form method="dialog">- Clock -<br/><a href="about.html">About</a><br/><button>OK</button></form></dialog>
 </main>
 <footer></footer>
 </body>
