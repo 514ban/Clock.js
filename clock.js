@@ -82,7 +82,8 @@ export class Clock {
 	if (this.#dateBottom) {
 	  this.element.querySelector('div.dt').classList.add('bottom');
 	}
-	if (this.#tid && !(this.date.getMinutes() % 5)) {
+	if (this.#tid && !(this.date.getMinutes() % 5) && this.date.getSeconds() == 0) {
+	  console.log(this.date.getSeconds());
 	  this.stop();
 	  this.start();
 	}
@@ -96,7 +97,7 @@ export class Clock {
   #checkEverySecondUntilZero() {
 	return new Promise(resolve => {
       this.#tid = setInterval(() => {
-		this.element.classList.remove('stop');
+		if (this.element.classList.contains('stop')) this.element.classList.remove('stop');
 		this.refresh();
 		if ((this.date.getSeconds()*1000) % this.intervalSec === 0) {
           clearInterval(this.#tid);
@@ -113,7 +114,7 @@ export class Clock {
 		const p1 = this.#waitUntilNextSecond(ms);
 		const p2 = this.#checkEverySecondUntilZero();
 		await Promise.all([p1, p2]);
-		this.element.classList.remove('stop');
+		if (this.element.classList.contains('stop')) this.element.classList.remove('stop');
 		this.#tid = setInterval( ()=>this.refresh(), this.intervalSec);
 		return this.#tid;
 	  })();
