@@ -84,7 +84,7 @@ export class Clock {
 	}
 	if (this.#tid && !(this.date.getMinutes() % 5) && this.date.getSeconds() == 0) {
 	  console.log(this.date.getSeconds());
-	  this.stop();
+	  this.stop(true);
 	  this.start();
 	}
 	if (this.#insertTitle) this.addToTitle();
@@ -97,7 +97,7 @@ export class Clock {
   #checkEverySecondUntilZero() {
 	return new Promise(resolve => {
       this.#tid = setInterval(() => {
-		if (this.element.classList.contains('stop')) this.element.classList.remove('stop');
+		this.element.classList.remove('stop');
 		this.refresh();
 		if ((this.date.getSeconds()*1000) % this.intervalSec === 0) {
           clearInterval(this.#tid);
@@ -114,17 +114,17 @@ export class Clock {
 		const p1 = this.#waitUntilNextSecond(ms);
 		const p2 = this.#checkEverySecondUntilZero();
 		await Promise.all([p1, p2]);
-		if (this.element.classList.contains('stop')) this.element.classList.remove('stop');
+		this.element.classList.remove('stop');
 		this.#tid = setInterval( ()=>this.refresh(), this.intervalSec);
 		return this.#tid;
 	  })();
 	}
   }
-  stop() {
+  stop(param) {
 	if (this.#tid) {
 	  clearInterval(this.#tid);
 	  this.#tid = null;
-	  this.element.classList.add('stop');
+	  if (!param) this.element.classList.add('stop');
 	}
 	return this.#tid;
   }
