@@ -161,38 +161,40 @@ export class Clock {
   }
 
   /* popup menu */
-  addPopupMenu(elem) {
+  addPopupMenu(elem,menu) {
 	if (!elem) return;
-	const menu = document.querySelector('dialog#popupmenu');
+	if (!menu) menu = document.querySelector('dialog#popupmenu');
 	if (!menu) return;
 
-	elem.style.display = 'unset';
-	
 	if (this.menuBtn) {
 	  this.menuBtn.removeEventListener('click',this.popupMenu);
-	  menu.removeEventListener('close',this.execPopupMenu);
 	  this.menuBtn = false;
+	}
+	if (this.menuDialog) {
+	  this.menuDialog.removeEventListener('close',this.execPopupMenu);
+	  this.menuDialog = false;
 	}
 
 	this.menuBtn = elem;
+	this.menuDialog = menu;
 	if (this.menuBtn) {
+	  this.menuBtn.style.display = 'unset';
 	  this.popupMenu = this.popupMenu.bind(this);
 	  this.menuBtn.addEventListener('click',this.popupMenu);
 	  this.execPopupMenu = this.execPopupMenu.bind(this);
-	  menu.addEventListener('close',this.execPopupMenu);
+	  this.menuDialog.addEventListener('close',this.execPopupMenu);
 	}
 	return this.menuBtn;
-  } 
+  }
 
   popupMenu() {
 	/* post menu button press processing , user-defined by extend-class */
-	const menu = document.querySelector('dialog#popupmenu');
-	if (menu) {
-	  menu.showModal();
-	  let tgt;
-	  if (tgt = menu.querySelector('button:last-of-type')) tgt.focus();
+	if (this.menuDialog) {
+	  this.menuDialog.showModal();
+	  let tgt = this.menuDialog.querySelector('button:last-of-type');
+	  if (tgt) tgt.focus();
 	}
-	return menu;
+	return this.menuDialog;
    }
   execPopupMenu(e) {
 	/* post popup closure processing , user-defined by extend-class `formdata = super.execPopupMenu(e);` */
