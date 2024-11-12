@@ -83,7 +83,6 @@ export class Clock {
 	  this.element.querySelector('div.dt').classList.add('bottom');
 	}
 	if (this.#tid && !(this.date.getMinutes() % 5) && this.date.getSeconds() == 0) {
-	  console.log(this.date.getSeconds());
 	  this.stop(true);
 	  this.start();
 	}
