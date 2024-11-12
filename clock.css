@@ -3,6 +3,7 @@
   container-type: size;
   width:100%;
   height:100%;
+  position:relative;
 
   &,* {
 	scrollbar-width:thin;
